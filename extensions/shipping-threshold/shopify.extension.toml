@@ -1,0 +1,21 @@
+api_version = "2026-04"
+
+[[extensions]]
+name = "t:name"
+handle = "shipping-threshold"
+type = "function"
+uid = "372f115f-e2c2-510d-4854-e0ff22ef1b28131b1966"
+description = "t:description"
+
+  [[extensions.targeting]]
+  target = "cart.delivery-options.transform.run"
+  input_query = "src/cart_delivery_options_transform_run.graphql"
+  export = "cart-delivery-options-transform-run"
+
+  [extensions.build]
+  command = ""
+  path = "dist/function.wasm"
+
+  [extensions.ui.paths]
+  create = "/"
+  details = "/"

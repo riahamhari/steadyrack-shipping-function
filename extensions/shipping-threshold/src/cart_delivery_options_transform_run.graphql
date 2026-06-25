@@ -1,0 +1,29 @@
+query CartDeliveryOptionsTransformRunInput {
+  cart {
+    attribute(key: "_igTestGroup") {
+      key
+      value
+    }
+    cost {
+      subtotalAmount {
+        amount
+      }
+    }
+    deliveryGroups {
+      deliveryOptions {
+        handle
+        cost {
+          amount
+        }
+      }
+    }
+  }
+  deliveryCustomization {
+    metafield(
+      namespace: "$app:shipping-threshold"
+      key: "function-configuration"
+    ) {
+      jsonValue
+    }
+  }
+}
