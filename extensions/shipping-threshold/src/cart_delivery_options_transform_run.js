@@ -24,20 +24,22 @@ export function cartDeliveryOptionsTransformRun(input) {
   const igTestGroup = input.cart.attribute?.value ?? "";
 
   // Known variation UUIDs from Intelligems
-  // Add any additional variant UUIDs once Jono confirms them
-  const CONTROL_UUID = "dde38d76";
-  const VARIANT_250_UUID = "25e70b40";
+  const CONTROL_UUID = "0f2b5066-2c16-43c8-bf1d-2e75ef7f6c1b";
+  const FLAT_RATE_250_UUID = "00721fa1-a158-444e-a5e7-fe3fa32c8484";
+  const FREE_SHIP_250_UUID = "b3575eaf-6937-4e94-91ac-0c30e03ac104";
 
   const isControl = igTestGroup.includes(CONTROL_UUID);
-  const isVariant250 = igTestGroup.includes(VARIANT_250_UUID);
+  const isFlatRate250 = igTestGroup.includes(FLAT_RATE_250_UUID);
+  const isFreeShip250 = igTestGroup.includes(FREE_SHIP_250_UUID);
 
-  // Fallback: if no recognised bucket, don't touch anything
-  if (!isControl && !isVariant250) {
+  // Fallback: unrecognised bucket — don't touch anything
+  if (!isControl && !isFlatRate250 && !isFreeShip250) {
     return NO_CHANGES;
   }
 
-  // Threshold based on bucket
-  const threshold = isVariant250 ? 250 : 300;
+  // Threshold and qualifying rate based on bucket
+  const threshold = isControl ? 300 : 250;
+  const qualifyingRate = isFreeShip250 ? 0 : 10;
 
   /** @type {Operation[]} */
   const operations = [];
@@ -51,15 +53,15 @@ export function cartDeliveryOptionsTransformRun(input) {
         const price = parseFloat(String(option.cost.amount));
 
         if (subtotal >= threshold) {
-          // Qualifies for discounted rate — show $10, hide $20 and $0
-          if (price === 20 || price === 0) {
+          // Qualifies — show qualifying rate only, hide everything else
+          if (price !== qualifyingRate) {
             operations.push({
               deliveryOptionHide: { deliveryOptionHandle: option.handle },
             });
           }
         } else {
-          // Standard rate — show $20, hide $10 and $0
-          if (price === 10 || price === 0) {
+          // Below threshold — show $20, hide everything else
+          if (price !== 20) {
             operations.push({
               deliveryOptionHide: { deliveryOptionHandle: option.handle },
             });
