@@ -3,6 +3,15 @@
     "export": "cart-delivery-options-transform-run",
     "target": "cart.delivery-options.transform.run",
     "input": {
+      "cart": {
+        "attribute": null,
+        "cost": {
+          "subtotalAmount": {
+            "amount": "0.0"
+          }
+        },
+        "deliveryGroups": []
+      },
       "deliveryCustomization": {
         "metafield": null
       }

@@ -1,6 +1,6 @@
 query CartDeliveryOptionsTransformRunInput {
   cart {
-    attribute(key: "_igTestGroup") {
+    attribute(key: "igTestGroups") {
       key
       value
     }
@@ -10,6 +10,10 @@ query CartDeliveryOptionsTransformRunInput {
       }
     }
     deliveryGroups {
+      deliveryAddress {
+        countryCode
+        provinceCode
+      }
       deliveryOptions {
         handle
         cost {

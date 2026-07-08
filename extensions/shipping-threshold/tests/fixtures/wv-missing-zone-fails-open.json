@@ -1,0 +1,41 @@
+{
+  "payload": {
+    "export": "cart-delivery-options-transform-run",
+    "target": "cart.delivery-options.transform.run",
+    "input": {
+      "cart": {
+        "attribute": {
+          "key": "igTestGroups",
+          "value": "fe3fa32c8484"
+        },
+        "cost": {
+          "subtotalAmount": {
+            "amount": "275.0"
+          }
+        },
+        "deliveryGroups": [
+          {
+            "deliveryAddress": {
+              "countryCode": "US",
+              "provinceCode": "WV"
+            },
+            "deliveryOptions": [
+              {
+                "handle": "only-twenty",
+                "cost": {
+                  "amount": "20.0"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "deliveryCustomization": {
+        "metafield": null
+      }
+    },
+    "output": {
+      "operations": []
+    }
+  }
+}
