@@ -24,9 +24,9 @@ export function cartDeliveryOptionsTransformRun(input) {
   const igTestGroup = input.cart.attribute?.value ?? "";
 
   // Known variation UUIDs from Intelligems
-  const CONTROL_UUID = "0f2b5066-2c16-43c8-bf1d-2e75ef7f6c1b";
-  const FLAT_RATE_250_UUID = "00721fa1-a158-444e-a5e7-fe3fa32c8484";
-  const FREE_SHIP_250_UUID = "b3575eaf-6937-4e94-91ac-0c30e03ac104";
+  const CONTROL_UUID = "2e75ef7f6c1b";
+  const FLAT_RATE_250_UUID = "fe3fa32c8484";
+  const FREE_SHIP_250_UUID = "0c30e03ac104";
 
   const isControl = igTestGroup.includes(CONTROL_UUID);
   const isFlatRate250 = igTestGroup.includes(FLAT_RATE_250_UUID);
@@ -83,3 +83,5 @@ export function cartDeliveryOptionsTransformRun(input) {
 
   return { operations };
 }
+
+// over 300 is 10$
