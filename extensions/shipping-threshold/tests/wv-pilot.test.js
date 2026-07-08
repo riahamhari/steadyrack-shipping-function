@@ -118,7 +118,29 @@ describe("fallbacks: attribute-less and unknown buckets never see all three rate
   });
 });
 
-describe("pilot guard: non-WV addresses are untouched", () => {
+describe("scope guard: only US groups carrying the full test rate set are touched", () => {
+  it("any US state with the $0/$10/$20 signature is in scope (Ohio, flat-250 at $275 shows only $10)", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${NOISE},${FLAT_250}`,
+        subtotal: 275,
+        groups: [{ address: { countryCode: "US", provinceCode: "OH" }, options: wvOptions() }],
+      })
+    );
+    expect(hiddenHandles(r)).toEqual(["h-free", "h-twenty"]);
+  });
+
+  it("a non-US group is untouched even if its rates match the signature", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${FLAT_250}`,
+        subtotal: 275,
+        groups: [{ address: { countryCode: "CA", provinceCode: "ON" }, options: wvOptions() }],
+      })
+    );
+    expect(r.operations).toEqual([]);
+  });
+
   it("Mainland US variant bucket in the $250-299 band gets NO operations (the checkout-breaker scenario)", () => {
     const r = cartDeliveryOptionsTransformRun(
       buildInput({
@@ -171,6 +193,22 @@ describe("split orders: charged once, checkout never empties", () => {
       })
     );
     expect(hiddenHandles(r)).toEqual(["g2-ten", "g2-twenty", "h-free", "h-twenty"]);
+  });
+
+  it("split across location groups where the second zone lacks the $0 rate: second group left native (config requirement: every test zone needs all three rates)", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${CONTROL}`,
+        subtotal: 400,
+        groups: [
+          { address: WV, options: wvOptions() },
+          { address: WV, options: [{ handle: "g2-ten", cost: { amount: "10.0" } }, { handle: "g2-twenty", cost: { amount: "20.0" } }] },
+        ],
+      })
+    );
+    // First group filtered to $10; second group has no signature so it is not
+    // zeroed. Documents why every US test zone must include the $0 rate.
+    expect(hiddenHandles(r)).toEqual(["h-free", "h-twenty"]);
   });
 
   it("mixed WV + non-WV groups: only the WV group is modified", () => {

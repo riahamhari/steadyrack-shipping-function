@@ -13,9 +13,14 @@ const NO_CHANGES = {
   operations: [],
 };
 
-// Pilot scope: SR-014 re-run only serves West Virginia checkouts.
-const PILOT_COUNTRY = "US";
-const PILOT_PROVINCE = "WV";
+const TEST_COUNTRY = "US";
+
+// A delivery group is only in test scope when its zone carries the full set
+// of unconditioned test rates. Rolling the test out to a new zone is pure
+// Shopify config: add these three flat rates (no conditions) to the zone.
+// Zones without this signature (Armed Forces weight rates, Federal US
+// carrier-calculated, any not-yet-configured zone) are never touched.
+const TEST_RATES = [0, 10, 20];
 
 /**
  * @param {CartDeliveryOptionsTransformRunInput} input
@@ -50,17 +55,19 @@ export function cartDeliveryOptionsTransformRun(input) {
   let paidGroupSeen = false;
 
   input.cart.deliveryGroups.forEach((group) => {
-    // Only touch groups delivering to the pilot region; every other address
-    // keeps its native rates.
-    const address = group.deliveryAddress;
-    if (
-      address?.countryCode !== PILOT_COUNTRY ||
-      address?.provinceCode !== PILOT_PROVINCE
-    ) {
+    // Scope guard: US groups whose options carry the full test rate set.
+    // Everything else keeps its native rates.
+    if (group.deliveryAddress?.countryCode !== TEST_COUNTRY) {
+      return;
+    }
+    const deliveryOptions = group.deliveryOptions;
+    const prices = deliveryOptions.map((option) =>
+      parseFloat(String(option.cost.amount))
+    );
+    if (!TEST_RATES.every((rate) => prices.includes(rate))) {
       return;
     }
 
-    const deliveryOptions = group.deliveryOptions;
     /** @type {Operation[]} */
     const groupHides = [];
 
@@ -87,8 +94,8 @@ export function cartDeliveryOptionsTransformRun(input) {
         }
       });
     } else {
-      // Additional WV group (split order) — force $0 so the order is only
-      // charged shipping once
+      // Additional test-scope group (split order across location groups) —
+      // force $0 so the order is only charged shipping once
       deliveryOptions.forEach((option) => {
         const price = parseFloat(String(option.cost.amount));
         if (price !== 0) {
@@ -100,8 +107,8 @@ export function cartDeliveryOptionsTransformRun(input) {
     }
 
     // Fail open: never hide every option in a group. If the expected rate is
-    // missing (e.g. zone misconfigured), show the native rates rather than
-    // break checkout with zero shipping methods.
+    // missing, show the native rates rather than break checkout with zero
+    // shipping methods.
     if (groupHides.length < deliveryOptions.length) {
       operations.push(...groupHides);
     }
