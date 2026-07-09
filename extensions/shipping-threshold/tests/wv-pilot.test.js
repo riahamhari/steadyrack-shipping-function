@@ -226,6 +226,49 @@ describe("split orders: charged once, checkout never empties", () => {
   });
 });
 
+describe("additive rollout: test rates coexist with the store's original conditioned rates", () => {
+  // Go-live is purely additive: the trio is ADDED to a zone whose original
+  // conditioned rates stay untouched. The function must show exactly one row.
+  const mainlandPlusTrio = (conditionedPrice) => [
+    { handle: "orig-conditioned", cost: { amount: conditionedPrice } },
+    ...wvOptions(),
+  ];
+
+  it("under $300 control: original conditioned $20 coexists with the trio, exactly one $20 shows", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${NOISE},${CONTROL}`,
+        subtotal: 169.99,
+        groups: [{ address: { countryCode: "US", provinceCode: "OH" }, options: mainlandPlusTrio("20.0") }],
+      })
+    );
+    // keeps the first $20 (orig-conditioned), hides the duplicate + free + ten
+    expect(hiddenHandles(r)).toEqual(["h-free", "h-ten", "h-twenty"]);
+  });
+
+  it("over $300 control: original conditioned $10 coexists with the trio, exactly one $10 shows", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${CONTROL}`,
+        subtotal: 350,
+        groups: [{ address: { countryCode: "US", provinceCode: "OH" }, options: mainlandPlusTrio("10.0") }],
+      })
+    );
+    expect(hiddenHandles(r)).toEqual(["h-free", "h-ten", "h-twenty"]);
+  });
+
+  it("$250-299 flat-250 bucket: conditioned $20 present, only the $10 shows", () => {
+    const r = cartDeliveryOptionsTransformRun(
+      buildInput({
+        attrValue: `${FLAT_250}`,
+        subtotal: 275,
+        groups: [{ address: { countryCode: "US", provinceCode: "OH" }, options: mainlandPlusTrio("20.0") }],
+      })
+    );
+    expect(hiddenHandles(r)).toEqual(["h-free", "h-twenty", "orig-conditioned"]);
+  });
+});
+
 describe("fail-open: never hide every rate in a group", () => {
   it("WV zone missing (today's real config: single conditioned $20 rate) + variant bucket in $250-299 band -> rate stays visible", () => {
     // Without fail-open this hid the only rate and broke checkout.

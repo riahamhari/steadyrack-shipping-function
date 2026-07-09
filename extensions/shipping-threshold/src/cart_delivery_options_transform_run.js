@@ -71,40 +71,33 @@ export function cartDeliveryOptionsTransformRun(input) {
     /** @type {Operation[]} */
     const groupHides = [];
 
+    // Paying group shows the threshold-qualified rate; any further test-scope
+    // group (split order across location groups) is forced to $0 so the order
+    // is only charged shipping once.
+    let targetRate;
     if (!paidGroupSeen) {
       paidGroupSeen = true;
-      // Paying fulfillment group — apply threshold logic
-      deliveryOptions.forEach((option) => {
-        const price = parseFloat(String(option.cost.amount));
-
-        if (subtotal >= threshold) {
-          // Qualifies — show qualifying rate only, hide everything else
-          if (price !== qualifyingRate) {
-            groupHides.push({
-              deliveryOptionHide: { deliveryOptionHandle: option.handle },
-            });
-          }
-        } else {
-          // Below threshold — show $20, hide everything else
-          if (price !== 20) {
-            groupHides.push({
-              deliveryOptionHide: { deliveryOptionHandle: option.handle },
-            });
-          }
-        }
-      });
+      targetRate = subtotal >= threshold ? qualifyingRate : 20;
     } else {
-      // Additional test-scope group (split order across location groups) —
-      // force $0 so the order is only charged shipping once
-      deliveryOptions.forEach((option) => {
-        const price = parseFloat(String(option.cost.amount));
-        if (price !== 0) {
-          groupHides.push({
-            deliveryOptionHide: { deliveryOptionHandle: option.handle },
-          });
-        }
-      });
+      targetRate = 0;
     }
+
+    // Keep exactly ONE option at the target price and hide everything else,
+    // including same-price duplicates. This lets the test rates coexist with
+    // the store's original conditioned rates (rollout is purely additive; no
+    // existing rate needs editing or deleting) without showing the customer
+    // two identical rows.
+    let targetKept = false;
+    deliveryOptions.forEach((option) => {
+      const price = parseFloat(String(option.cost.amount));
+      if (price === targetRate && !targetKept) {
+        targetKept = true;
+        return;
+      }
+      groupHides.push({
+        deliveryOptionHide: { deliveryOptionHandle: option.handle },
+      });
+    });
 
     // Fail open: never hide every option in a group. If the expected rate is
     // missing, show the native rates rather than break checkout with zero
