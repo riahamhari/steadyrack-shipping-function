@@ -1,0 +1,64 @@
+{
+  "payload": {
+    "export": "cart-delivery-options-transform-run",
+    "target": "cart.delivery-options.transform.run",
+    "input": {
+      "cart": {
+        "attribute": {
+          "key": "igTestGroups",
+          "value": "0c30e03ac104"
+        },
+        "cost": {
+          "subtotalAmount": {
+            "amount": "275.0"
+          }
+        },
+        "deliveryGroups": [
+          {
+            "deliveryAddress": {
+              "countryCode": "US",
+              "provinceCode": "WV"
+            },
+            "deliveryOptions": [
+              {
+                "handle": "wv-free",
+                "cost": {
+                  "amount": "0.0"
+                }
+              },
+              {
+                "handle": "wv-ten",
+                "cost": {
+                  "amount": "10.0"
+                }
+              },
+              {
+                "handle": "wv-twenty",
+                "cost": {
+                  "amount": "20.0"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "deliveryCustomization": {
+        "metafield": null
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "wv-ten"
+          }
+        },
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "wv-twenty"
+          }
+        }
+      ]
+    }
+  }
+}

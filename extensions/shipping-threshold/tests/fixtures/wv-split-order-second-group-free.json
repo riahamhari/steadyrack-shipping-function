@@ -1,0 +1,100 @@
+{
+  "payload": {
+    "export": "cart-delivery-options-transform-run",
+    "target": "cart.delivery-options.transform.run",
+    "input": {
+      "cart": {
+        "attribute": {
+          "key": "igTestGroups",
+          "value": "2e75ef7f6c1b"
+        },
+        "cost": {
+          "subtotalAmount": {
+            "amount": "400.0"
+          }
+        },
+        "deliveryGroups": [
+          {
+            "deliveryAddress": {
+              "countryCode": "US",
+              "provinceCode": "WV"
+            },
+            "deliveryOptions": [
+              {
+                "handle": "g1-free",
+                "cost": {
+                  "amount": "0.0"
+                }
+              },
+              {
+                "handle": "g1-ten",
+                "cost": {
+                  "amount": "10.0"
+                }
+              },
+              {
+                "handle": "g1-twenty",
+                "cost": {
+                  "amount": "20.0"
+                }
+              }
+            ]
+          },
+          {
+            "deliveryAddress": {
+              "countryCode": "US",
+              "provinceCode": "WV"
+            },
+            "deliveryOptions": [
+              {
+                "handle": "g2-free",
+                "cost": {
+                  "amount": "0.0"
+                }
+              },
+              {
+                "handle": "g2-ten",
+                "cost": {
+                  "amount": "10.0"
+                }
+              },
+              {
+                "handle": "g2-twenty",
+                "cost": {
+                  "amount": "20.0"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "deliveryCustomization": {
+        "metafield": null
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "g1-free"
+          }
+        },
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "g1-twenty"
+          }
+        },
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "g2-ten"
+          }
+        },
+        {
+          "deliveryOptionHide": {
+            "deliveryOptionHandle": "g2-twenty"
+          }
+        }
+      ]
+    }
+  }
+}
