@@ -1,6 +1,6 @@
 query CartDeliveryOptionsTransformRunInput {
   cart {
-    attribute(key: "_igTestGroup") {
+    attribute(key: "igTestGroups") {
       key
       value
     }
