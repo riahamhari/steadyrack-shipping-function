@@ -1,0 +1,23 @@
+query CartTransformRunInput {
+  cart {
+    attribute(key: "igTestGroups") {
+      key
+      value
+    }
+    lines {
+      id
+      quantity
+      cost {
+        amountPerQuantity {
+          amount
+          currencyCode
+        }
+      }
+      merchandise {
+        ... on ProductVariant {
+          id
+        }
+      }
+    }
+  }
+}
