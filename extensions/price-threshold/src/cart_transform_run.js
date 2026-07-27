@@ -13,8 +13,8 @@ const NO_CHANGES = {
 
 // Known variation ids from Intelligems (SR price test)
 // TBC: update once Jono sends UUIDs from Intelligems
-const PRICE_PLUS_10_UUID = ""; // +10% variant
-const PRICE_PLUS_25_UUID = ""; // +25% variant
+const PRICE_PLUS_10_UUID = "cf87ddf3c939"; // +10% variant
+const PRICE_PLUS_25_UUID = "148235ea00c9"; // +25% variant
 
 // ProFlex Rack product ID — only transform lines for this product
 const PROFLEX_PRODUCT_ID = "gid://shopify/Product/9734115393821";
